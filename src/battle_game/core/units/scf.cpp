@@ -142,7 +142,7 @@ void Scf::Fire() {
   }
   if (bullet_number_ == 0) {
     atk_mode_ = false;
-    drum_cd_ = 5.6 * kTickPerSecond;
+    drum_cd_ = 16 * kTickPerSecond;
     return;
   }
   if (fire_count_down_ == 0) {
@@ -153,8 +153,8 @@ void Scf::Fire() {
         auto velocity = Rotate(glm::vec2{0.0f, 20.0f}, turret_rotation_);
         GenerateBullet<bullet::CannonBall>(
             position_ + Rotate({0.0f, 1.2f}, turret_rotation_),
-            turret_rotation_, GetDamageScale(), velocity);
-        fire_count_down_ = 0.3 * kTickPerSecond;  // Fire interval 0.3 second.
+            turret_rotation_, GetDamageScale() * 2, velocity);
+        fire_count_down_ = 0.3 * kTickPerSecond;
         bullet_number_--;
       }
     }
@@ -162,7 +162,7 @@ void Scf::Fire() {
   if (fire_count_down_) {
     fire_count_down_--;
   }
-} //弹鼓炮，8发/0.3秒每发，全部打完开始装填，最快8秒一轮
+} //弹鼓炮，8发/0.3秒每发，全部打完开始装填，最快18.4秒一轮，标伤为20；tiny_tank为1秒每发，标伤为10
 
 bool Scf::IsHit(glm::vec2 position) const {
   position = WorldToLocal(position);
