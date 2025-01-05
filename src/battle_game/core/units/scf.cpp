@@ -1,4 +1,4 @@
-#include "tiny_tank.h"
+#include "scf.h"
 
 #include "battle_game/core/bullets/bullets.h"
 #include "battle_game/core/game_core.h"
@@ -11,7 +11,7 @@ uint32_t tank_body_model_index = 0xffffffffu;
 uint32_t tank_turret_model_index = 0xffffffffu;
 }  // namespace
 
-Tank::Tank(GameCore *game_core, uint32_t id, uint32_t player_id)
+Scf::Scf(GameCore *game_core, uint32_t id, uint32_t player_id)
     : Unit(game_core, id, player_id) {
   if (!~tank_body_model_index) {
     auto mgr = AssetsManager::GetInstance();
@@ -70,7 +70,7 @@ Tank::Tank(GameCore *game_core, uint32_t id, uint32_t player_id)
   }
 }
 
-void Tank::Render() {
+void Scf::Render() {
   battle_game::SetTransformation(position_, rotation_);
   battle_game::SetTexture(0);
   battle_game::SetColor(game_core_->GetPlayerColor(player_id_));
@@ -79,13 +79,13 @@ void Tank::Render() {
   battle_game::DrawModel(tank_turret_model_index);
 }
 
-void Tank::Update() {
-  TankMove(3.0f, glm::radians(180.0f));
+void Scf::Update() {
+  TankMove(4.0f, glm::radians(210.0f));
   TurretRotate();
   Fire();
 }
 
-void Tank::TankMove(float move_speed, float rotate_angular_speed) {
+void Scf::TankMove(float move_speed, float rotate_angular_speed) {
   auto player = game_core_->GetPlayer(player_id_);
   if (player) {
     auto &input_data = player->GetInputData();
@@ -117,7 +117,7 @@ void Tank::TankMove(float move_speed, float rotate_angular_speed) {
   }
 }
 
-void Tank::TurretRotate() {
+void Scf::TurretRotate() {
   auto player = game_core_->GetPlayer(player_id_);
   if (player) {
     auto &input_data = player->GetInputData();
@@ -130,7 +130,21 @@ void Tank::TurretRotate() {
   }
 }
 
-void Tank::Fire() {
+void Scf::Fire() {
+  if (drum_cd_) {
+    drum_cd_--;
+    return;
+  }
+  if (!atk_mode_) {
+    atk_mode_ = true;
+    bullet_nummber_ = 8;
+    fire_count_down_ = 0;
+  }
+  if (bullet_number_ == 0) {
+    atk_mode_ = false;
+    drum_cd_ = 5.6 * kTickPerSecond;
+    return;
+  }
   if (fire_count_down_ == 0) {
     auto player = game_core_->GetPlayer(player_id_);
     if (player) {
@@ -140,27 +154,28 @@ void Tank::Fire() {
         GenerateBullet<bullet::CannonBall>(
             position_ + Rotate({0.0f, 1.2f}, turret_rotation_),
             turret_rotation_, GetDamageScale(), velocity);
-        fire_count_down_ = kTickPerSecond;  // Fire interval 1 second.
+        fire_count_down_ = 0.3 * kTickPerSecond;  // Fire interval 0.3 second.
+        bullet_number_--;
       }
     }
   }
   if (fire_count_down_) {
     fire_count_down_--;
   }
-}
+} //弹鼓炮，8发/0.3秒每发，全部打完开始装填，最快8秒一轮
 
-bool Tank::IsHit(glm::vec2 position) const {
+bool Scf::IsHit(glm::vec2 position) const {
   position = WorldToLocal(position);
   return position.x > -0.8f && position.x < 0.8f && position.y > -1.0f &&
          position.y < 1.0f && position.x + position.y < 1.6f &&
          position.y - position.x < 1.6f;
 }
 
-const char *Tank::UnitName() const {
-  return "Tiny Tank";
+const char *Scf::UnitName() const {
+  return "Surcouf";
 }
 
-const char *Tank::Author() const {
-  return "LazyJazz";
+const char *Scf::Author() const {
+  return "Pan SiYan";
 }
 }  // namespace battle_game::unit
