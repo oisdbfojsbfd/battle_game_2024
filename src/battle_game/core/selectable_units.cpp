@@ -23,7 +23,6 @@ void GameCore::GeneratePrimaryUnitList() {
    * */
   ADD_SELECTABLE_UNIT(unit::Tank);
   ADD_SELECTABLE_UNIT(unit::Scf);
-  ADD_SELECTABLE_UNIT(unit::Tankr);
 
   unit.reset();
 }
