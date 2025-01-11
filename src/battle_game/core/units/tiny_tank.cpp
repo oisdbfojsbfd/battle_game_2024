@@ -130,21 +130,17 @@ void Tank::TurretRotate() {
   }
 }
 
-float FireDistribution(float range) {
-  return std::sqrt(2 * (game_core->RandomFloat() - 0.5f)) * 0.5f * range;
-}
-
 void Tank::Fire() {
   if (fire_count_down_ == 0) {
     auto player = game_core_->GetPlayer(player_id_);
     if (player) {
       auto &input_data = player->GetInputData();
       if (input_data.mouse_button_down[GLFW_MOUSE_BUTTON_LEFT]) {
-        auto velocity = Rotate(glm::vec2{0.0f, 20.0f}, turret_rotation_);
+        auto velocity = Rotate(glm::vec2{0.0f, 20.0f}, turret_rotation_ + (1 - std::sqrt(game_core_->RandomFloat())) * (std::signbit(game_core_->RandomFloat() - 0.5f) - 0.5f) * glm::radians(90.0f));
         GenerateBullet<bullet::CannonBall>(
             position_ + Rotate({0.0f, 1.2f}, turret_rotation_),
-            turret_rotation_ + FireDistribution(glm::radians(10.0f)), GetDamageScale(), velocity);
-        fire_count_down_ = kTickPerSecond;  // Fire interval 1 second.
+            turret_rotation_, GetDamageScale(), velocity);
+        fire_count_down_ = 0.1f * kTickPerSecond;  // Fire interval 0.1 second, for distribution test.
       }
     }
   }
