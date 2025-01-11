@@ -137,7 +137,7 @@ void Scf::Fire() {
   }
   if (!atk_mode_) {
     atk_mode_ = true;
-    bullet_nummber_ = 8;
+    bullet_number_ = 8;
     fire_count_down_ = 0;
   }
   if (bullet_number_ == 0) {
@@ -154,7 +154,7 @@ void Scf::Fire() {
         GenerateBullet<bullet::CannonBall>(
             position_ + Rotate({0.0f, 1.2f}, turret_rotation_),
             turret_rotation_, GetDamageScale() * 2, velocity);
-        fire_count_down_ = 0.3 * kTickPerSecond;
+        fire_count_down_ = uint32_t(0.3 * kTickPerSecond); // = 18
         bullet_number_--;
       }
     }

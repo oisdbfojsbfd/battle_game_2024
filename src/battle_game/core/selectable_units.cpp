@@ -1,4 +1,5 @@
 #include "battle_game/core/game_core.h"
+#include "battle_game/core/units/scf.h"
 
 namespace battle_game {
 
